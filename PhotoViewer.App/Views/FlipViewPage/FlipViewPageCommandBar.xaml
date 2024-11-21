@@ -1,0 +1,117 @@
+﻿<CommandBar
+    x:Class="PhotoViewer.App.Views.FlipViewPageCommandBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PhotoViewer.App.Views"
+    xmlns:shared="using:PhotoViewer.App.Views.Shared"
+    xmlns:res="using:PhotoViewer.App.Resources"   
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"  
+    Style="{StaticResource DefaultCommandBarStyle}"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    DefaultLabelPosition="Collapsed">
+
+    <CommandBar.Content>
+        <StackPanel Orientation="Horizontal" Height="48" Spacing="12" Margin="8,0,0,0">
+            <ProgressRing 
+                VerticalAlignment="Center"
+                Width="24" Height="24"
+                IsActive="{x:Bind ViewModel.BackgroundTasks.ShowProgressIndicator,Mode=OneWay}"/>
+            <TextBlock
+                VerticalAlignment="Center"
+                Text="{x:Bind ViewModel.BackgroundTasks.StatusText, Mode=OneWay}"/>
+        </StackPanel>
+    </CommandBar.Content>
+
+    <AppBarButton 
+        Icon="ViewAll"
+        Label="{x:Bind res:Strings.FlipViewPageCommandBar_OverviewButton}"
+        ToolTipService.ToolTip="{x:Bind res:Strings.FlipViewPageCommandBar_OverviewButton}"
+        Command="{x:Bind ViewModel.NavigateToOverviewPageCommand}"/>
+    <AppBarButton 
+        Icon="View" 
+        Label="{x:Bind res:Strings.FlipViewPageCommandBar_CompareButton}"
+        ToolTipService.ToolTip="{x:Bind res:Strings.FlipViewPageCommandBar_CompareButton}"
+        Command="{x:Bind ViewModel.NavigateToComparePageCommand}"/>
+    <AppBarButton 
+        Icon="SlideShow" 
+        Label="{x:Bind res:Strings.FlipViewPageCommandBar_DiashowButton}"
+        Command="{x:Bind ViewModel.StartDiashowCommand}">
+        <AppBarButton.KeyboardAccelerators>
+            <KeyboardAccelerator Modifiers="Control" Key="D"/>
+        </AppBarButton.KeyboardAccelerators>
+    </AppBarButton>
+    <AppBarButton 
+        Icon="Tag" 
+        Label="{x:Bind res:Strings.FlipViewPageCommandBar_MetadataButton}"
+        Command="{x:Bind ViewModel.ToggleMetadataPanelCommand}">
+        <AppBarButton.KeyboardAccelerators>
+            <KeyboardAccelerator Modifiers="Control" Key="M"/>
+        </AppBarButton.KeyboardAccelerators>
+    </AppBarButton>
+    <AppBarButton        
+        ToolTipService.ToolTip="{x:Bind res:Strings.FlipViewPageCommandBar_EditButton}"
+        Command="{x:Bind ViewModel.EditImageCommand}">
+        <AppBarButton.Icon>
+            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE9E9;" />
+        </AppBarButton.Icon>
+    </AppBarButton>
+    <AppBarButton
+        Icon="Crop" 
+        ToolTipService.ToolTip="{x:Bind res:Strings.FlipViewPageCommandBar_CropButton}"
+        Command="{x:Bind ViewModel.CropImageCommand}"/>
+    <AppBarButton 
+        Icon="Rotate" 
+        Label="{x:Bind res:Strings.FlipViewPageCommandBar_RotateButton}"
+        Command="{x:Bind ViewModel.RotateCommand}">
+        <AppBarButton.KeyboardAccelerators>
+            <KeyboardAccelerator Modifiers="Control" Key="R"/>
+        </AppBarButton.KeyboardAccelerators>
+    </AppBarButton>
+    <AppBarButton 
+        Icon="Delete" 
+        Label="{x:Bind res:Strings.FlipViewPageCommandBar_DeleteButton}"
+        Command="{x:Bind ViewModel.DeleteCommand}">
+        <AppBarButton.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Delete"/>
+        </AppBarButton.KeyboardAccelerators>
+    </AppBarButton>
+    <AppBarButton 
+        Icon="Back" 
+        Label="{x:Bind res:Strings.FlipViewPageCommandBar_PreviousButton}"
+        Command="{x:Bind ViewModel.SelectPreviousCommand}">
+        <AppBarButton.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Left"/>
+        </AppBarButton.KeyboardAccelerators>
+    </AppBarButton>
+    <AppBarButton 
+        Icon="Forward" 
+        Label="{x:Bind res:Strings.FlipViewPageCommandBar_NextButton}"
+        Command="{x:Bind ViewModel.SelectNextCommand}">
+        <AppBarButton.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Right"/>
+        </AppBarButton.KeyboardAccelerators>
+    </AppBarButton>
+
+    <!-- enable keyboard accelerators for custom app bar buttons used as secondary commands -->
+    <shared:ToolsAppBarButton Width="0" IsTabStop="False" DataContext="{x:Bind ViewModel.ToolsMenuModel}" Flyout="{x:Null}"/>
+
+    <CommandBar.SecondaryCommands>
+        <shared:SortAppBarButton DataContext="{x:Bind ViewModel.SortMenuModel}"/>
+        <shared:ToolsAppBarButton DataContext="{x:Bind ViewModel.ToolsMenuModel}"/>
+        <AppBarButton 
+            Icon="OpenLocal" 
+            Label="{x:Bind res:Strings.FlipViewPageCommandBar_OpenFolderButton}"
+            Command="{x:Bind ViewModel.OpenFolderCommand}">
+            <AppBarButton.KeyboardAccelerators>
+                <KeyboardAccelerator Key="O" Modifiers="Control"/>
+            </AppBarButton.KeyboardAccelerators>
+        </AppBarButton>      
+        <AppBarButton 
+            Icon="Setting" 
+            Label="{x:Bind res:Strings.FlipViewPageCommandBar_SettingsButton}"
+            Command="{x:Bind ViewModel.NavigateToSettingsPageCommand}"/>
+    </CommandBar.SecondaryCommands>
+
+</CommandBar>

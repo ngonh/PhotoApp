@@ -1,0 +1,175 @@
+﻿<Page
+    x:Class="PhotoViewer.App.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PhotoViewer.App.Views"
+    xmlns:converters="using:PhotoViewer.App.Converters"
+    xmlns:models="using:PhotoViewer.Core.Models"
+    xmlns:res="using:PhotoViewer.App.Resources"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <converters:TimeSpanToDoubleConverter x:Key="TimeSpanToDoubleConverter"/>
+        <converters:DeleteLinkedFilesOptionToDisplayNameConverter x:Key="DeleteLinkedFilesOptionToDisplayNameConverter"/>
+        <converters:AppThemeToDisplayNameConverter x:Key="AppThemeToDisplayNameConverter"/>
+    </Page.Resources>
+
+    <Grid Margin="48,32,48,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MaxWidth="800"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal" Padding="0,0,0,16">
+            <Button ToolTipService.ToolTip="{x:Bind res:Strings.SettingsPage_BackButtonTooltip}"
+                    Command="{x:Bind ViewModel.NavigateBackCommand}" Padding="6" Margin="-8,2,0,0" 
+                    VerticalAlignment="Center" Background="Transparent" BorderBrush="Transparent">
+                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE012;" FontSize="24"/>
+            </Button>
+            <TextBlock Margin="8,0,0,0" Style="{ThemeResource TitleTextBlockStyle}" Text="{x:Bind res:Strings.SettingsPage_Title}"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" Margin="0,0,16,0">
+            <StackPanel Padding="0,0,0,32">
+                <TextBlock 
+                    Margin="0,8,0,8"
+                    Style="{ThemeResource SubtitleTextBlockStyle}" 
+                    Text="{x:Bind res:Strings.SettingsPage_AppearanceSectionTittle}"/>
+                <RadioButtons 
+                    Header="{x:Bind res:Strings.SettingsPage_ThemeHeader}"
+                    MaxColumns="3" 
+                    ItemsSource="{x:Bind ViewModel.AvailableThemes}" 
+                    SelectedItem="{x:Bind ViewModel.Settings.Theme, Mode=OneWay}"
+                    SelectionChanged="Theme_SelectionChanged">
+                    <RadioButtons.ItemTemplate>
+                        <DataTemplate x:DataType="models:AppTheme">
+                            <TextBlock Text="{x:Bind Converter={StaticResource AppThemeToDisplayNameConverter}}"/>
+                        </DataTemplate>
+                    </RadioButtons.ItemTemplate>
+                </RadioButtons>
+                <ToggleSwitch 
+                    Margin="0,12,0,0"
+                    Header="{x:Bind res:Strings.SettingsPage_ShowDeleteAnimationToggle}"
+                    IsOn="{x:Bind ViewModel.Settings.ShowDeleteAnimation, Mode=TwoWay}"/>
+                <ToggleSwitch 
+                    Margin="0,4,0,0"
+                    Header="{x:Bind res:Strings.SettingsPage_AutoShowMetadataPanelToogle}"                              
+                    IsOn="{x:Bind ViewModel.Settings.AutoOpenMetadataPanel, Mode=TwoWay}"/>
+                <ToggleSwitch 
+                    Margin="0,4,0,0"
+                    Header="{x:Bind res:Strings.SettingsPage_AutoShowDetailsBarToogle}"                               
+                    IsOn="{x:Bind ViewModel.Settings.AutoOpenDetailsBar, Mode=TwoWay}"/>
+                <TextBlock 
+                    Margin="0,4,0,0"
+                    Text="{x:Bind res:Strings.SettingsPage_DiashowTimeLabel}"/>
+                <NumberBox 
+                    Margin="0,4,0,0" HorizontalAlignment="Left" MinWidth="100" SpinButtonPlacementMode="Compact"                           
+                    Value="{x:Bind ViewModel.Settings.DiashowTime, Mode=TwoWay, Converter={StaticResource TimeSpanToDoubleConverter}}"
+                    Minimum="1" Maximum="3600"/>
+
+                <TextBlock 
+                    Margin="0,32,0,8" 
+                    Style="{ThemeResource SubtitleTextBlockStyle}" 
+                    Text="{x:Bind res:Strings.SettingsPage_RawFilesSectionTittle}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.Settings.LinkRawFiles, Mode=TwoWay}">
+                    <ToggleSwitch.Header>
+                        <StackPanel>
+                            <TextBlock Text="{x:Bind res:Strings.SettingsPage_LinkRawFilesHeader}"/>
+                            <TextBlock 
+                                Foreground="{ThemeResource SystemColorDisabledTextBrush}"
+                                Text="{x:Bind res:Strings.SettingsPage_LinkRawFilesDescripiton}"/>
+                        </StackPanel>
+                    </ToggleSwitch.Header>
+                </ToggleSwitch>
+                <TextBlock 
+                    Margin="0,8,0,0"
+                    Text="{x:Bind res:Strings.SettingsPage_RawFilesFolderNameHeader}"/>
+                <TextBlock 
+                    Foreground="{ThemeResource SystemColorDisabledTextBrush}" 
+                    Text="{x:Bind res:Strings.SettingsPage_RawFilesFolderNameDescription}"/>
+                <TextBox 
+                    Margin="0,4,0,0" HorizontalAlignment="Left" MinWidth="200"
+                    Text="{x:Bind ViewModel.Settings.RawFilesFolderName, Mode=TwoWay}"/>
+                <TextBlock
+                    Margin="0,16,0,0" 
+                    Text="{x:Bind res:Strings.SettingsPage_DeleteLinkedRawFilesHeader}"/>
+                <RadioButtons 
+                    MaxColumns="3" 
+                    ItemsSource="{x:Bind ViewModel.AvailableDeleteLinkedFilesOptions}" 
+                    SelectedItem="{x:Bind ViewModel.Settings.DeleteLinkedFilesOption, Mode=OneWay}"
+                    SelectionChanged="DeleteLinkedFilesOptions_SelectionChanged">
+                    <RadioButtons.ItemTemplate>
+                        <DataTemplate x:DataType="models:DeleteLinkedFilesOption">
+                            <TextBlock Text="{x:Bind Converter={StaticResource DeleteLinkedFilesOptionToDisplayNameConverter}}"/>
+                        </DataTemplate>
+                    </RadioButtons.ItemTemplate>
+                </RadioButtons>
+
+                <TextBlock 
+                    Margin="0,32,0,8" 
+                    Style="{ThemeResource SubtitleTextBlockStyle}" 
+                    Text="{x:Bind res:Strings.SettingsPage_VideoFilesSectionTittle}"/>
+                <ToggleSwitch 
+                    Header="{x:Bind res:Strings.SettingsPage_ShowVideoFilesHeader}"
+                    IsOn="{x:Bind ViewModel.Settings.IncludeVideos, Mode=TwoWay}"/>
+
+              
+            </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer Grid.Column="1" Grid.Row="1" Margin="16,0,0,0">
+            <StackPanel Padding="0,0,0,32">             
+                <TextBlock 
+                    Margin="0,8,0,8" 
+                    Style="{ThemeResource SubtitleTextBlockStyle}" 
+                    Text="{x:Bind res:Strings.SettingsPage_LoggingSectionTittle}"/>
+                <ToggleSwitch         
+                    IsOn="{x:Bind ViewModel.Settings.IsDebugLogEnabled, Mode=TwoWay}"
+                    Header="{x:Bind res:Strings.SettingsPage_IsDebugLogEnabledToggleHeader}"/>
+                <Button 
+                    Margin="0,8,0,0"
+                    Content="{x:Bind res:Strings.SettingsPage_OpenLogFileButton}"
+                    Command="{x:Bind ViewModel.ShowLogCommand}"/>          
+
+                <TextBlock
+                    Margin="0,32,0,8"
+                    Style="{ThemeResource SubtitleTextBlockStyle}" 
+                    Text="{x:Bind res:Strings.SettingsPage_ManageSettingsSectionTittle}"/>
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <Button 
+                        Content="{x:Bind res:Strings.SettingsPage_ExportSettingsButton}"
+                        Command="{x:Bind ViewModel.ExportCommand}"/>
+                    <Button 
+                        Content="{x:Bind res:Strings.SettingsPage_ImportSettingsButton}" 
+                        Command="{x:Bind ViewModel.ImportCommand}"/>
+                    <Button 
+                        Content="{x:Bind res:Strings.SettingsPage_ResetSettingsButton}"
+                        Command="{x:Bind ViewModel.ResetCommand}"/>
+                </StackPanel>
+
+                <TextBlock
+                    Margin="0,32,0,8"
+                    Style="{ThemeResource SubtitleTextBlockStyle}"
+                    Text="{x:Bind res:Strings.SettingsPage_AboutSectionTittle}"/>
+                <TextBlock Text="{x:Bind ViewModel.AppName}"/>
+                <TextBlock>
+                    <Run Text="Version"/>
+                    <Run Text="{x:Bind ViewModel.Version}"/>
+                </TextBlock>           
+                <TextBlock Text="© Sebastian Bäumlisberger"/>
+                <HyperlinkButton 
+                    Padding="0"
+                    Content="GitHub"
+                    NavigateUri="https://github.com/sbaeumlisberger/winui-photo-viewer"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>
