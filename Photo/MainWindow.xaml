@@ -6,9 +6,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="using:Photo.Views"
+        xmlns:converters="using:Photo.Converters"
         mc:Ignorable="d">
 
     <Grid x:Name="RootPanel">
+        <Grid.Resources>
+            <converters:MatToBitmapSourceConverter x:Key="MatToBitmapSourceConverter" />
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
@@ -26,17 +30,27 @@
             <StackPanel Orientation="Vertical">
                 <Button Content="Import"
                         Command="{Binding ImportImageCommand}" />
-                <Button Content="Export" />
+                <Button Content="Export"
+                        Command="{Binding ExportImageCommand}" />
             </StackPanel>
         </Grid>
 
-        <StackPanel Grid.Column="1"
-                    Grid.Row="0"
-                    Grid.RowSpan="2"
-                    BorderBrush="Gray"
-                    BorderThickness="0 1 1 1">
-
-        </StackPanel>
+        <Grid Grid.Column="1"
+              Grid.Row="0"
+              Grid.RowSpan="2"
+              BorderBrush="Gray"
+              BorderThickness="0 1 1 1">
+            <StackPanel Visibility="{Binding OperationVisibility}">
+                <Button Content="Crop"
+                        Command="{Binding CropCommand}" />
+                <Button Content="Rotate"
+                        Command="{Binding RotateCommand}" />
+                <Button Content="Flip"
+                        Command="{Binding FlipCommand}" />
+                <Button Content="Reload Image"
+                        Command="{Binding ReloadCommand}" />
+            </StackPanel>
+        </Grid>
 
         <ScrollViewer x:Name="scrollImageTarget"
                       PointerWheelChanged="scrollImageTarget_PointerWheelChanged"
@@ -48,15 +62,41 @@
                       BorderBrush="Gray"
                       BorderThickness="0 1 1 1">
             <Image x:Name="mainImage"
-                   Source="{Binding Image}"
+                   Source="{Binding Image, Converter={StaticResource MatToBitmapSourceConverter}}"
                    Margin="5" />
         </ScrollViewer>
 
-        <StackPanel Grid.Column="2"
-                    Grid.Row="2"
-                    BorderBrush="Gray"
-                    BorderThickness="0 0 1 1">
-
-        </StackPanel>
+        <Grid Grid.Column="2"
+              Grid.Row="2"
+              BorderBrush="Gray"
+              BorderThickness="0 0 1 1">
+            <StackPanel Orientation="Horizontal"
+                        Visibility="{Binding CropVisibility}">
+                <Button Content="16:9"
+                        Command="{Binding CropLevel1Command}" />
+                <Button Content="4:3"
+                        Command="{Binding CropLevel2Command}" />
+                <Button Content="3:4"
+                        Command="{Binding CropLevel3Command}" />
+                <Button Content="1:1"
+                        Command="{Binding CropLevel4Command}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"
+                        Visibility="{Binding RotateVisibility}">
+                <Button Content="Rotate Clockwise 90°"
+                        Command="{Binding RotateLevel1Command}" />
+                <Button Content="Rotate Counter Clockwise 90°"
+                        Command="{Binding RotateLevel2Command}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"
+                        Visibility="{Binding FlipVisibility}">
+                <Button Content="Flip Horizontal"
+                        Command="{Binding FlipLevel1Command}" />
+                <Button Content="Flip Vertical"
+                        Command="{Binding FlipLevel2Command}" />
+                <Button Content="Flip Horizontal Vertical"
+                        Command="{Binding FlipLevel3Command}" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
