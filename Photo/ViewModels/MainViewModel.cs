@@ -267,6 +267,7 @@ namespace Photo.ViewModels
             ReloadCommand = new RelayCommand(() =>
             {
                 Image = new Mat(ImagePath);
+                flag = false;
             });
             CropCommand = new RelayCommand(() =>
             {
@@ -644,8 +645,6 @@ namespace Photo.ViewModels
         {
             PictureStyle("D:\\Assets\\Boder\\border10.png");
         }
-        private Mat matTemp;
-        private bool flag = false;
         public void SetBorder()
         {
             if (flag == true)
@@ -676,7 +675,9 @@ namespace Photo.ViewModels
         private Visibility pictureStyleVisibility;
         private ObservableCollection<ColorItem> colorCode;
         private ColorItem selectedColor;
-        private int borderThickness;
+        private int borderThickness; 
+        private Mat matTemp;
+        private bool flag = false;
         #endregion
     }
 }
