@@ -49,22 +49,38 @@
                         Command="{Binding FlipCommand}" />
                 <Button Content="Reload Image"
                         Command="{Binding ReloadCommand}" />
+                <Button Content="Picture Style"
+                        Command="{Binding PictureStyleCommand}" />
             </StackPanel>
         </Grid>
 
-        <ScrollViewer x:Name="scrollImageTarget"
-                      PointerWheelChanged="scrollImageTarget_PointerWheelChanged"
-                      HorizontalScrollBarVisibility="Auto"
-                      VerticalScrollBarVisibility="Auto"
-                      ZoomMode="Disabled"
-                      Grid.Column="2"
-                      Grid.Row="0"
-                      BorderBrush="Gray"
-                      BorderThickness="0 1 1 1">
-            <Image x:Name="mainImage"
-                   Source="{Binding Image, Converter={StaticResource MatToBitmapSourceConverter}}"
-                   Margin="5" />
-        </ScrollViewer>
+        <Grid Grid.Column="2"
+              Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <ScrollViewer x:Name="scrollImageTarget"
+                          PointerWheelChanged="scrollImageTarget_PointerWheelChanged"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"
+                          ZoomMode="Disabled"
+                          Grid.Row="0"
+                          BorderBrush="Gray"
+                          BorderThickness="0 1 1 1">
+                <Image x:Name="mainImage"
+                       Source="{Binding Image, Converter={StaticResource MatToBitmapSourceConverter}}"
+                       Margin="5"
+                       PointerMoved="mainImage_PointerMoved" />
+            </ScrollViewer>
+            <StackPanel Grid.Row="1"
+                        Orientation="Horizontal"
+                        BorderBrush="Gray"
+                        BorderThickness="0 0 1 1">
+                <TextBlock x:Name="XPo" />
+                <TextBlock x:Name="YPo" />
+            </StackPanel>
+        </Grid>
 
         <Grid Grid.Column="2"
               Grid.Row="2"
@@ -96,6 +112,59 @@
                         Command="{Binding FlipLevel2Command}" />
                 <Button Content="Flip Horizontal Vertical"
                         Command="{Binding FlipLevel3Command}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"
+                        Visibility="{Binding PictureStyleVisibility}">
+                <Button Content="Style1"
+                        Command="{Binding StyleLevel1Command}" />
+                <Button Content="Style2"
+                        Command="{Binding StyleLevel2Command}" />
+                <Button Content="Style3"
+                        Command="{Binding StyleLevel3Command}" />
+                <Button Content="Style4"
+                        Command="{Binding StyleLevel4Command}" />
+                <Button Content="Style5"
+                        Command="{Binding StyleLevel5Command}" />
+                <Button Content="Style6"
+                        Command="{Binding StyleLevel6Command}" />
+                <Border BorderBrush="Gray"
+                        BorderThickness="1" />
+                <Grid Width="500">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.5*" />
+                        <ColumnDefinition Width="1.5*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="0"
+                               Text="Enter color code:"
+                               VerticalAlignment="Center"
+                               HorizontalTextAlignment="Center" />
+                    <TextBox Grid.Column="0"
+                             Grid.Row="1"
+                             Text="{Binding ColorCode, UpdateSourceTrigger=PropertyChanged}" 
+                             Height="30"/>
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="0"
+                               Text="Enter Border Thickness:"
+                               VerticalAlignment="Center"
+                               HorizontalTextAlignment="Center" />
+                    <TextBox Grid.Column="1"
+                             Grid.Row="1"
+                             Text="{Binding BorderThickness}"
+                             Height="30" />
+                    <Button Grid.Column="2"
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Content="Set"
+                            Command="{Binding SetBorderCommand}"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center" />
+                </Grid>
             </StackPanel>
         </Grid>
     </Grid>

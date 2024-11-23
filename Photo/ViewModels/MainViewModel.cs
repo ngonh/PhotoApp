@@ -61,6 +61,34 @@ namespace Photo.ViewModels
                 OnPropertyChanged(nameof(FlipVisibility));
             }
         }
+        public Visibility PictureStyleVisibility
+        {
+            get => pictureStyleVisibility;
+            set
+            {
+                pictureStyleVisibility = value;
+                OnPropertyChanged(nameof(PictureStyleVisibility));
+            }
+        }
+        public string ColorCode
+        {
+            get => colorCode;
+            set
+            {
+                colorCode = value;
+                OnPropertyChanged(nameof(ColorCode));
+            }
+        }
+        public int BorderThickness
+        {
+            get => borderThickness;
+            set
+            {
+                borderThickness = value;
+                OnPropertyChanged(nameof(BorderThickness));
+            }
+        }
+
         #endregion
 
         #region Constructor(s)
@@ -72,12 +100,13 @@ namespace Photo.ViewModels
             CropVisibility = Visibility.Collapsed;
             RotateVisibility = Visibility.Collapsed;
             FlipVisibility = Visibility.Collapsed;
+            PictureStyleVisibility = Visibility.Collapsed;
             #endregion
 
             #region CommonCommand(s)
             ImportImageCommand = new AsyncRelayCommand(ImportImageAsync);
             ExportImageCommand = new AsyncRelayCommand(SaveImageAsync);
-            ReloadCommand = new RelayCommand(() => 
+            ReloadCommand = new RelayCommand(() =>
             {
                 Image = new Mat(ImagePath);
             });
@@ -90,6 +119,7 @@ namespace Photo.ViewModels
                 #region Collapsed
                 RotateVisibility = Visibility.Collapsed;
                 FlipVisibility = Visibility.Collapsed;
+                PictureStyleVisibility = Visibility.Collapsed;
                 #endregion
             });
             RotateCommand = new RelayCommand(() =>
@@ -101,6 +131,7 @@ namespace Photo.ViewModels
                 #region Collapsed
                 CropVisibility = Visibility.Collapsed;
                 FlipVisibility = Visibility.Collapsed;
+                PictureStyleVisibility = Visibility.Collapsed;
                 #endregion
             });
             FlipCommand = new RelayCommand(() =>
@@ -110,6 +141,19 @@ namespace Photo.ViewModels
                 #endregion
 
                 #region Collapsed
+                CropVisibility = Visibility.Collapsed;
+                RotateVisibility = Visibility.Collapsed;
+                PictureStyleVisibility = Visibility.Collapsed;
+                #endregion
+            });
+            PictureStyleCommand = new RelayCommand(() =>
+            {
+                #region Visible
+                PictureStyleVisibility = Visibility.Visible;
+                #endregion
+
+                #region Collapsed
+                FlipVisibility = Visibility.Collapsed;
                 CropVisibility = Visibility.Collapsed;
                 RotateVisibility = Visibility.Collapsed;
                 #endregion
@@ -132,6 +176,14 @@ namespace Photo.ViewModels
             FlipLevel2Command = new RelayCommand(FlipLevel2);
             FlipLevel3Command = new RelayCommand(FlipLevel3);
             #endregion
+
+            #region StyleLevelCommand(s)
+            StyleLevel1Command = new RelayCommand(PictureStyleLevel1);
+            StyleLevel2Command = new RelayCommand(PictureStyleLevel2);
+            StyleLevel3Command = new RelayCommand(PictureStyleLevel3);
+
+            SetBorderCommand = new RelayCommand(SetBorder);
+            #endregion
             #endregion
         }
         #endregion
@@ -143,6 +195,7 @@ namespace Photo.ViewModels
         public ICommand CropCommand { get; }
         public ICommand RotateCommand { get; }
         public ICommand FlipCommand { get; }
+        public ICommand PictureStyleCommand { get; }
 
         public ICommand CropLevel1Command { get; }
         public ICommand CropLevel2Command { get; }
@@ -155,6 +208,12 @@ namespace Photo.ViewModels
         public ICommand FlipLevel1Command { get; }
         public ICommand FlipLevel2Command { get; }
         public ICommand FlipLevel3Command { get; }
+
+        public ICommand StyleLevel1Command { get; }
+        public ICommand StyleLevel2Command { get; }
+        public ICommand StyleLevel3Command { get; }
+
+        public ICommand SetBorderCommand { get; }
         #endregion
 
         #region Method(s)
@@ -331,6 +390,97 @@ namespace Photo.ViewModels
             Cv2.Flip(Image, dst, FlipMode.XY);
             Image = dst;
         }
+        public void PictureStyle(string filePath)
+        {
+            Mat borderPattern = Cv2.ImRead(filePath);
+
+            if (borderPattern.Empty())
+            {
+                return;
+            }
+
+            int borderThickness = 20;
+
+            int newWidth = Image.Width + 2 * borderThickness;
+            int newHeight = Image.Height + 2 * borderThickness;
+
+            Mat imageWithBorder = new Mat(newHeight, newWidth, Image.Type());
+            imageWithBorder.SetTo(new Scalar(255, 255, 255));
+
+            for (int y = 0; y < newHeight; y++)
+            {
+                for (int x = 0; x < newWidth; x++)
+                {
+                    if (y < borderThickness || y >= newHeight - borderThickness ||
+                        x < borderThickness || x >= newWidth - borderThickness)
+                    {
+                        int patternY = y % borderPattern.Rows;
+                        int patternX = x % borderPattern.Cols;
+
+                        Vec3b borderPixel = borderPattern.Get<Vec3b>(patternY, patternX);
+                        imageWithBorder.Set(y, x, borderPixel);
+                    }
+                    else
+                    {
+                        int originalY = y - borderThickness;
+                        int originalX = x - borderThickness;
+
+                        Vec3b imagePixel = Image.Get<Vec3b>(originalY, originalX);
+                        imageWithBorder.Set(y, x, imagePixel);
+                    }
+                }
+            }
+            Image = imageWithBorder;
+        }
+        public void PictureStyleLevel1()
+        {
+            PictureStyle("D:\\Assets\\Boder\\border1.png");
+        }
+        public void PictureStyleLevel2()
+        {
+            PictureStyle("D:\\Assets\\Boder\\border2.png");
+        }
+        public void PictureStyleLevel3()
+        {
+            PictureStyle("D:\\Assets\\Boder\\border1.png");
+        }
+        public void SetBorder()
+        {
+            Mat imageWithBorder = new Mat();
+            Cv2.CopyMakeBorder(Image, imageWithBorder, BorderThickness, BorderThickness,
+                BorderThickness, BorderThickness, BorderTypes.Constant, Scalar.Red);
+            Image = imageWithBorder;    
+        }
+        public Scalar ColorStringToScalar(string colorString)
+        {
+            colorString = colorString.Trim();
+
+            if (colorString.StartsWith("#"))
+            {
+                colorString = colorString.Substring(1);
+
+                int r = Convert.ToInt32(colorString.Substring(0, 2), 16);
+                int g = Convert.ToInt32(colorString.Substring(2, 2), 16);
+                int b = Convert.ToInt32(colorString.Substring(4, 2), 16);
+
+                return new Scalar(b, g, r);
+            }
+            else if (colorString.Contains(","))
+            {
+                string[] components = colorString.Split(',');
+
+                if (components.Length == 3)
+                {
+                    int r = int.Parse(components[0].Trim());
+                    int g = int.Parse(components[1].Trim());
+                    int b = int.Parse(components[2].Trim());
+
+                    return new Scalar(b, g, r);
+                }
+            }
+
+            throw new ArgumentException($"Chuỗi mã màu không hợp lệ: {colorString}");
+        }
         #endregion
 
         #region Private(s)
@@ -339,6 +489,9 @@ namespace Photo.ViewModels
         private Visibility operationVisibility;
         private Visibility rotateVisibility;
         private Visibility flipVisibility;
+        private Visibility pictureStyleVisibility;
+        private string colorCode;
+        private int borderThickness;
         #endregion
     }
 }
