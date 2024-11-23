@@ -73,6 +73,7 @@
                        Margin="5"
                        PointerMoved="mainImage_PointerMoved" />
             </ScrollViewer>
+            
             <StackPanel Grid.Row="1"
                         Orientation="Horizontal"
                         BorderBrush="Gray"

@@ -644,12 +644,26 @@ namespace Photo.ViewModels
         {
             PictureStyle("D:\\Assets\\Boder\\border10.png");
         }
+        private Mat matTemp;
+        private bool flag = false;
         public void SetBorder()
         {
-            Mat imageWithBorder = new Mat();
-            Cv2.CopyMakeBorder(Image, imageWithBorder, BorderThickness, BorderThickness,
-                BorderThickness, BorderThickness, BorderTypes.Constant, SelectedColor.Value);
-            Image = imageWithBorder;
+            if (flag == true)
+            {
+                Mat imageWithBorder = new Mat();
+                Cv2.CopyMakeBorder(matTemp, imageWithBorder, BorderThickness, BorderThickness,
+                    BorderThickness, BorderThickness, BorderTypes.Constant, SelectedColor.Value);
+                Image = imageWithBorder;
+                return;
+            } else
+            {
+                matTemp = Image;
+                Mat imageWithBorder = new Mat();
+                Cv2.CopyMakeBorder(matTemp, imageWithBorder, BorderThickness, BorderThickness,
+                    BorderThickness, BorderThickness, BorderTypes.Constant, SelectedColor.Value);
+                Image = imageWithBorder;
+                flag = true;
+            }
         }
         #endregion
 
