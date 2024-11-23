@@ -47,10 +47,10 @@
                         Command="{Binding RotateCommand}" />
                 <Button Content="Flip"
                         Command="{Binding FlipCommand}" />
-                <Button Content="Reload Image"
-                        Command="{Binding ReloadCommand}" />
                 <Button Content="Picture Style"
                         Command="{Binding PictureStyleCommand}" />
+                <Button Content="Reload Image"
+                        Command="{Binding ReloadCommand}" />
             </StackPanel>
         </Grid>
 
@@ -127,6 +127,14 @@
                         Command="{Binding StyleLevel5Command}" />
                 <Button Content="Style6"
                         Command="{Binding StyleLevel6Command}" />
+                <Button Content="Style7"
+                        Command="{Binding StyleLevel7Command}" />
+                <Button Content="Style8"
+                        Command="{Binding StyleLevel8Command}" />
+                <Button Content="Style9"
+                        Command="{Binding StyleLevel9Command}" />
+                <Button Content="Style10"
+                        Command="{Binding StyleLevel10Command}" />
                 <Border BorderBrush="Gray"
                         BorderThickness="1" />
                 <Grid Width="500">
@@ -141,13 +149,17 @@
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Column="0"
                                Grid.Row="0"
-                               Text="Enter color code:"
+                               Text="Enter color:"
                                VerticalAlignment="Center"
                                HorizontalTextAlignment="Center" />
-                    <TextBox Grid.Column="0"
-                             Grid.Row="1"
-                             Text="{Binding ColorCode, UpdateSourceTrigger=PropertyChanged}" 
-                             Height="30"/>
+                    <ComboBox Grid.Column="0"
+                              Grid.Row="1"
+                              Height="40"
+                              ItemsSource="{Binding ColorCode}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              DisplayMemberPath="Name"
+                              SelectedItem="{Binding SelectedColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Grid.Column="1"
                                Grid.Row="0"
                                Text="Enter Border Thickness:"
@@ -155,8 +167,8 @@
                                HorizontalTextAlignment="Center" />
                     <TextBox Grid.Column="1"
                              Grid.Row="1"
-                             Text="{Binding BorderThickness}"
-                             Height="30" />
+                             Text="{Binding BorderThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Height="40" />
                     <Button Grid.Column="2"
                             Grid.Row="0"
                             Grid.RowSpan="2"

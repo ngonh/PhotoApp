@@ -2,8 +2,10 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OpenCvSharp;
+using Photo.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -70,7 +72,7 @@ namespace Photo.ViewModels
                 OnPropertyChanged(nameof(PictureStyleVisibility));
             }
         }
-        public string ColorCode
+        public ObservableCollection<ColorItem> ColorCode
         {
             get => colorCode;
             set
@@ -88,13 +90,169 @@ namespace Photo.ViewModels
                 OnPropertyChanged(nameof(BorderThickness));
             }
         }
-
+        public ColorItem SelectedColor
+        {
+            get => selectedColor;
+            set
+            {
+                selectedColor = value;
+                OnPropertyChanged(nameof(SelectedColor));
+            }
+        }
         #endregion
 
         #region Constructor(s)
         public MainViewModel()
         {
             #region Initialize
+            BorderThickness = 1;
+            SelectedColor = new ColorItem() { Name = "Black", Value = Scalar.Black };
+
+            ColorCode = new ObservableCollection<ColorItem>
+            {
+                new ColorItem { Name = "AliceBlue", Value = Scalar.AliceBlue },
+                new ColorItem { Name = "AntiqueWhite", Value = Scalar.AntiqueWhite },
+                new ColorItem { Name = "Aqua", Value = Scalar.Aqua },
+                new ColorItem { Name = "Aquamarine", Value = Scalar.Aquamarine },
+                new ColorItem { Name = "Azure", Value = Scalar.Azure },
+                new ColorItem { Name = "Beige", Value = Scalar.Beige },
+                new ColorItem { Name = "Bisque", Value = Scalar.Bisque },
+                new ColorItem { Name = "Black", Value = Scalar.Black },
+                new ColorItem { Name = "BlanchedAlmond", Value = Scalar.BlanchedAlmond },
+                new ColorItem { Name = "Blue", Value = Scalar.Blue },
+                new ColorItem { Name = "BlueViolet", Value = Scalar.BlueViolet },
+                new ColorItem { Name = "Brown", Value = Scalar.Brown },
+                new ColorItem { Name = "BurlyWood", Value = Scalar.BurlyWood },
+                new ColorItem { Name = "CadetBlue", Value = Scalar.CadetBlue },
+                new ColorItem { Name = "Chartreuse", Value = Scalar.Chartreuse },
+                new ColorItem { Name = "Chocolate", Value = Scalar.Chocolate },
+                new ColorItem { Name = "Coral", Value = Scalar.Coral },
+                new ColorItem { Name = "CornflowerBlue", Value = Scalar.CornflowerBlue },
+                new ColorItem { Name = "Cornsilk", Value = Scalar.Cornsilk },
+                new ColorItem { Name = "Crimson", Value = Scalar.Crimson },
+                new ColorItem { Name = "Cyan", Value = Scalar.Cyan },
+                new ColorItem { Name = "DarkBlue", Value = Scalar.DarkBlue },
+                new ColorItem { Name = "DarkCyan", Value = Scalar.DarkCyan },
+                new ColorItem { Name = "DarkGoldenrod", Value = Scalar.DarkGoldenrod },
+                new ColorItem { Name = "DarkGray", Value = Scalar.DarkGray },
+                new ColorItem { Name = "DarkGreen", Value = Scalar.DarkGreen },
+                new ColorItem { Name = "DarkKhaki", Value = Scalar.DarkKhaki },
+                new ColorItem { Name = "DarkMagenta", Value = Scalar.DarkMagenta },
+                new ColorItem { Name = "DarkOliveGreen", Value = Scalar.DarkOliveGreen },
+                new ColorItem { Name = "DarkOrange", Value = Scalar.DarkOrange },
+                new ColorItem { Name = "White", Value = Scalar.White },
+                new ColorItem { Name = "DarkOrchid", Value = Scalar.DarkOrchid },
+                new ColorItem { Name = "DarkRed", Value = Scalar.DarkRed },
+                new ColorItem { Name = "DarkSalmon", Value = Scalar.DarkSalmon },
+                new ColorItem { Name = "DarkSeaGreen", Value = Scalar.DarkSeaGreen },
+                new ColorItem { Name = "DarkSlateBlue", Value = Scalar.DarkSlateBlue },
+                new ColorItem { Name = "DarkSlateGray", Value = Scalar.DarkSlateGray },
+                new ColorItem { Name = "DarkTurquoise", Value = Scalar.DarkTurquoise },
+                new ColorItem { Name = "DarkViolet", Value = Scalar.DarkViolet },
+                new ColorItem { Name = "DeepPink", Value = Scalar.DeepPink },
+                new ColorItem { Name = "DeepSkyBlue", Value = Scalar.DeepSkyBlue },
+                new ColorItem { Name = "DimGray", Value = Scalar.DimGray },
+                new ColorItem { Name = "DodgerBlue", Value = Scalar.DodgerBlue },
+                new ColorItem { Name = "Firebrick", Value = Scalar.Firebrick },
+                new ColorItem { Name = "FloralWhite", Value = Scalar.FloralWhite },
+                new ColorItem { Name = "ForestGreen", Value = Scalar.ForestGreen },
+                new ColorItem { Name = "Fuchsia", Value = Scalar.Fuchsia },
+                new ColorItem { Name = "Gainsboro", Value = Scalar.Gainsboro },
+                new ColorItem { Name = "GhostWhite", Value = Scalar.GhostWhite },
+                new ColorItem { Name = "Gold", Value = Scalar.Gold },
+                new ColorItem { Name = "Goldenrod", Value = Scalar.Goldenrod },
+                new ColorItem { Name = "Gray", Value = Scalar.Gray },
+                new ColorItem { Name = "Green", Value = Scalar.Green },
+                new ColorItem { Name = "GreenYellow", Value = Scalar.GreenYellow },
+                new ColorItem { Name = "Honeydew", Value = Scalar.Honeydew },
+                new ColorItem { Name = "HotPink", Value = Scalar.HotPink },
+                new ColorItem { Name = "IndianRed", Value = Scalar.IndianRed },
+                new ColorItem { Name = "Indigo", Value = Scalar.Indigo },
+                new ColorItem { Name = "Ivory", Value = Scalar.Ivory },
+                new ColorItem { Name = "Khaki", Value = Scalar.Khaki },
+                new ColorItem { Name = "Lavender", Value = Scalar.Lavender },
+                new ColorItem { Name = "LavenderBlush", Value = Scalar.LavenderBlush },
+                new ColorItem { Name = "LawnGreen", Value = Scalar.LawnGreen },
+                new ColorItem { Name = "LemonChiffon", Value = Scalar.LemonChiffon },
+                new ColorItem { Name = "LightBlue", Value = Scalar.LightBlue },
+                new ColorItem { Name = "LightCoral", Value = Scalar.LightCoral },
+                new ColorItem { Name = "LightCyan", Value = Scalar.LightCyan },
+                new ColorItem { Name = "LightGoldenrodYellow", Value = Scalar.LightGoldenrodYellow },
+                new ColorItem { Name = "LightGray", Value = Scalar.LightGray },
+                new ColorItem { Name = "LightGreen", Value = Scalar.LightGreen },
+                new ColorItem { Name = "LightPink", Value = Scalar.LightPink },
+                new ColorItem { Name = "LightSalmon", Value = Scalar.LightSalmon },
+                new ColorItem { Name = "LightSeaGreen", Value = Scalar.LightSeaGreen },
+                new ColorItem { Name = "LightSkyBlue", Value = Scalar.LightSkyBlue },
+                new ColorItem { Name = "LightSlateGray", Value = Scalar.LightSlateGray },
+                new ColorItem { Name = "LightSteelBlue", Value = Scalar.LightSteelBlue },
+                new ColorItem { Name = "LightYellow", Value = Scalar.LightYellow },
+                new ColorItem { Name = "Lime", Value = Scalar.Lime },
+                new ColorItem { Name = "LimeGreen", Value = Scalar.LimeGreen },
+                new ColorItem { Name = "Linen", Value = Scalar.Linen },
+                new ColorItem { Name = "Magenta", Value = Scalar.Magenta },
+                new ColorItem { Name = "Maroon", Value = Scalar.Maroon },
+                new ColorItem { Name = "MediumAquamarine", Value = Scalar.MediumAquamarine },
+                new ColorItem { Name = "MediumBlue", Value = Scalar.MediumBlue },
+                new ColorItem { Name = "MediumOrchid", Value = Scalar.MediumOrchid },
+                new ColorItem { Name = "MediumPurple", Value = Scalar.MediumPurple },
+                new ColorItem { Name = "MediumSeaGreen", Value = Scalar.MediumSeaGreen },
+                new ColorItem { Name = "MediumSlateBlue", Value = Scalar.MediumSlateBlue },
+                new ColorItem { Name = "MediumSpringGreen", Value = Scalar.MediumSpringGreen },
+                new ColorItem { Name = "MediumTurquoise", Value = Scalar.MediumTurquoise },
+                new ColorItem { Name = "MediumVioletRed", Value = Scalar.MediumVioletRed },
+                new ColorItem { Name = "MidnightBlue", Value = Scalar.MidnightBlue },
+                new ColorItem { Name = "MintCream", Value = Scalar.MintCream },
+                new ColorItem { Name = "MistyRose", Value = Scalar.MistyRose },
+                new ColorItem { Name = "Moccasin", Value = Scalar.Moccasin },
+                new ColorItem { Name = "NavajoWhite", Value = Scalar.NavajoWhite },
+                new ColorItem { Name = "Navy", Value = Scalar.Navy },
+                new ColorItem { Name = "OldLace", Value = Scalar.OldLace },
+                new ColorItem { Name = "Olive", Value = Scalar.Olive },
+                new ColorItem { Name = "OliveDrab", Value = Scalar.OliveDrab },
+                new ColorItem { Name = "Orange", Value = Scalar.Orange },
+                new ColorItem { Name = "OrangeRed", Value = Scalar.OrangeRed },
+                new ColorItem { Name = "Orchid", Value = Scalar.Orchid },
+                new ColorItem { Name = "PaleGoldenrod", Value = Scalar.PaleGoldenrod },
+                new ColorItem { Name = "PaleGreen", Value = Scalar.PaleGreen },
+                new ColorItem { Name = "PaleTurquoise", Value = Scalar.PaleTurquoise },
+                new ColorItem { Name = "PaleVioletRed", Value = Scalar.PaleVioletRed },
+                new ColorItem { Name = "PapayaWhip", Value = Scalar.PapayaWhip },
+                new ColorItem { Name = "PeachPuff", Value = Scalar.PeachPuff },
+                new ColorItem { Name = "Peru", Value = Scalar.Peru },
+                new ColorItem { Name = "Pink", Value = Scalar.Pink },
+                new ColorItem { Name = "Plum", Value = Scalar.Plum },
+                new ColorItem { Name = "PowderBlue", Value = Scalar.PowderBlue },
+                new ColorItem { Name = "Purple", Value = Scalar.Purple },
+                new ColorItem { Name = "Red", Value = Scalar.Red },
+                new ColorItem { Name = "RosyBrown", Value = Scalar.RosyBrown },
+                new ColorItem { Name = "RoyalBlue", Value = Scalar.RoyalBlue },
+                new ColorItem { Name = "SaddleBrown", Value = Scalar.SaddleBrown },
+                new ColorItem { Name = "Salmon", Value = Scalar.Salmon },
+                new ColorItem { Name = "SandyBrown", Value = Scalar.SandyBrown },
+                new ColorItem { Name = "SeaGreen", Value = Scalar.SeaGreen },
+                new ColorItem { Name = "SeaShell", Value = Scalar.SeaShell },
+                new ColorItem { Name = "Sienna", Value = Scalar.Sienna },
+                new ColorItem { Name = "Silver", Value = Scalar.Silver },
+                new ColorItem { Name = "SkyBlue", Value = Scalar.SkyBlue },
+                new ColorItem { Name = "SlateBlue", Value = Scalar.SlateBlue },
+                new ColorItem { Name = "SlateGray", Value = Scalar.SlateGray },
+                new ColorItem { Name = "Snow", Value = Scalar.Snow },
+                new ColorItem { Name = "SpringGreen", Value = Scalar.SpringGreen },
+                new ColorItem { Name = "SteelBlue", Value = Scalar.SteelBlue },
+                new ColorItem { Name = "Tan", Value = Scalar.Tan },
+                new ColorItem { Name = "Teal", Value = Scalar.Teal },
+                new ColorItem { Name = "Thistle", Value = Scalar.Thistle },
+                new ColorItem { Name = "Tomato", Value = Scalar.Tomato },
+                new ColorItem { Name = "Turquoise", Value = Scalar.Turquoise },
+                new ColorItem { Name = "Violet", Value = Scalar.Violet },
+                new ColorItem { Name = "Wheat", Value = Scalar.Wheat },
+                new ColorItem { Name = "White", Value = Scalar.White },
+                new ColorItem { Name = "WhiteSmoke", Value = Scalar.WhiteSmoke },
+                new ColorItem { Name = "Yellow", Value = Scalar.Yellow },
+                new ColorItem { Name = "YellowGreen", Value = Scalar.YellowGreen }
+            };
+
             OperationVisibility = Visibility.Collapsed;
 
             CropVisibility = Visibility.Collapsed;
@@ -181,6 +339,13 @@ namespace Photo.ViewModels
             StyleLevel1Command = new RelayCommand(PictureStyleLevel1);
             StyleLevel2Command = new RelayCommand(PictureStyleLevel2);
             StyleLevel3Command = new RelayCommand(PictureStyleLevel3);
+            StyleLevel4Command = new RelayCommand(PictureStyleLevel4);
+            StyleLevel5Command = new RelayCommand(PictureStyleLevel5);
+            StyleLevel6Command = new RelayCommand(PictureStyleLevel6);
+            StyleLevel7Command = new RelayCommand(PictureStyleLevel7);
+            StyleLevel8Command = new RelayCommand(PictureStyleLevel8);
+            StyleLevel9Command = new RelayCommand(PictureStyleLevel9);
+            StyleLevel10Command = new RelayCommand(PictureStyleLevel10);
 
             SetBorderCommand = new RelayCommand(SetBorder);
             #endregion
@@ -212,6 +377,13 @@ namespace Photo.ViewModels
         public ICommand StyleLevel1Command { get; }
         public ICommand StyleLevel2Command { get; }
         public ICommand StyleLevel3Command { get; }
+        public ICommand StyleLevel4Command { get; }
+        public ICommand StyleLevel5Command { get; }
+        public ICommand StyleLevel6Command { get; }
+        public ICommand StyleLevel7Command { get; }
+        public ICommand StyleLevel8Command { get; }
+        public ICommand StyleLevel9Command { get; }
+        public ICommand StyleLevel10Command { get; }
 
         public ICommand SetBorderCommand { get; }
         #endregion
@@ -399,7 +571,7 @@ namespace Photo.ViewModels
                 return;
             }
 
-            int borderThickness = 20;
+            int borderThickness = 10;
 
             int newWidth = Image.Width + 2 * borderThickness;
             int newHeight = Image.Height + 2 * borderThickness;
@@ -442,44 +614,42 @@ namespace Photo.ViewModels
         }
         public void PictureStyleLevel3()
         {
-            PictureStyle("D:\\Assets\\Boder\\border1.png");
+            PictureStyle("D:\\Assets\\Boder\\border3.png");
+        }
+        public void PictureStyleLevel4()
+        {
+            PictureStyle("D:\\Assets\\Boder\\border4.png");
+        }
+        public void PictureStyleLevel5()
+        {
+            PictureStyle("D:\\Assets\\Boder\\border5.png");
+        }
+        public void PictureStyleLevel6()
+        {
+            PictureStyle("D:\\Assets\\Boder\\border6.png");
+        }
+        public void PictureStyleLevel7()
+        {
+            PictureStyle("D:\\Assets\\Boder\\border7.png");
+        }
+        public void PictureStyleLevel8()
+        {
+            PictureStyle("D:\\Assets\\Boder\\border8.png");
+        }
+        public void PictureStyleLevel9()
+        {
+            PictureStyle("D:\\Assets\\Boder\\border9.png");
+        }
+        public void PictureStyleLevel10()
+        {
+            PictureStyle("D:\\Assets\\Boder\\border10.png");
         }
         public void SetBorder()
         {
             Mat imageWithBorder = new Mat();
             Cv2.CopyMakeBorder(Image, imageWithBorder, BorderThickness, BorderThickness,
-                BorderThickness, BorderThickness, BorderTypes.Constant, Scalar.Red);
-            Image = imageWithBorder;    
-        }
-        public Scalar ColorStringToScalar(string colorString)
-        {
-            colorString = colorString.Trim();
-
-            if (colorString.StartsWith("#"))
-            {
-                colorString = colorString.Substring(1);
-
-                int r = Convert.ToInt32(colorString.Substring(0, 2), 16);
-                int g = Convert.ToInt32(colorString.Substring(2, 2), 16);
-                int b = Convert.ToInt32(colorString.Substring(4, 2), 16);
-
-                return new Scalar(b, g, r);
-            }
-            else if (colorString.Contains(","))
-            {
-                string[] components = colorString.Split(',');
-
-                if (components.Length == 3)
-                {
-                    int r = int.Parse(components[0].Trim());
-                    int g = int.Parse(components[1].Trim());
-                    int b = int.Parse(components[2].Trim());
-
-                    return new Scalar(b, g, r);
-                }
-            }
-
-            throw new ArgumentException($"Chuỗi mã màu không hợp lệ: {colorString}");
+                BorderThickness, BorderThickness, BorderTypes.Constant, SelectedColor.Value);
+            Image = imageWithBorder;
         }
         #endregion
 
@@ -490,7 +660,8 @@ namespace Photo.ViewModels
         private Visibility rotateVisibility;
         private Visibility flipVisibility;
         private Visibility pictureStyleVisibility;
-        private string colorCode;
+        private ObservableCollection<ColorItem> colorCode;
+        private ColorItem selectedColor;
         private int borderThickness;
         #endregion
     }
