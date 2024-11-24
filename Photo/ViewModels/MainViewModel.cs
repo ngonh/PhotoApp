@@ -426,7 +426,7 @@ namespace Photo.ViewModels
 
                     ImagePath = file.Path;
                     if (Image != null) OperationVisibility = Visibility.Visible;
-
+                    flag = false;
                     ContentDialog dialog = new ContentDialog
                     {
                         Title = "Thành công",
