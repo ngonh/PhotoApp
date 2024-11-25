@@ -572,38 +572,36 @@ namespace Photo.ViewModels
                 return;
             }
 
-            int borderThickness = 10;
+            int borderThickness = 50;
 
             int newWidth = Image.Width + 2 * borderThickness;
             int newHeight = Image.Height + 2 * borderThickness;
 
-            Mat imageWithBorder = new Mat(newHeight, newWidth, Image.Type());
-            imageWithBorder.SetTo(new Scalar(255, 255, 255));
+            Mat result = new Mat(newHeight, newWidth, MatType.CV_8UC3);
 
-            for (int y = 0; y < newHeight; y++)
+            for (int y = 0; y < newHeight; y += borderPattern.Rows)
             {
-                for (int x = 0; x < newWidth; x++)
+                for (int x = 0; x < newWidth; x += borderPattern.Cols)
                 {
-                    if (y < borderThickness || y >= newHeight - borderThickness ||
-                        x < borderThickness || x >= newWidth - borderThickness)
-                    {
-                        int patternY = y % borderPattern.Rows;
-                        int patternX = x % borderPattern.Cols;
+                    Rect roi = new Rect(x, y,
+                        Math.Min(borderPattern.Cols, newWidth - x),
+                        Math.Min(borderPattern.Rows, newHeight - y));
 
-                        Vec3b borderPixel = borderPattern.Get<Vec3b>(patternY, patternX);
-                        imageWithBorder.Set(y, x, borderPixel);
-                    }
-                    else
+                    if (roi.X < borderThickness || roi.Y < borderThickness ||
+                        roi.X + roi.Width > newWidth - borderThickness ||
+                        roi.Y + roi.Height > newHeight - borderThickness)
                     {
-                        int originalY = y - borderThickness;
-                        int originalX = x - borderThickness;
-
-                        Vec3b imagePixel = Image.Get<Vec3b>(originalY, originalX);
-                        imageWithBorder.Set(y, x, imagePixel);
+                        Mat targetRegion = new Mat(result, roi);
+                        borderPattern[0, targetRegion.Rows, 0, targetRegion.Cols].CopyTo(targetRegion);
                     }
                 }
             }
-            Image = imageWithBorder;
+
+            Rect imageRoi = new Rect(borderThickness, borderThickness, Image.Width, Image.Height);
+            Mat centerRegion = new Mat(result, imageRoi);
+            Image.CopyTo(centerRegion);
+
+            Image = result;
         }
         public void PictureStyleLevel1()
         {
