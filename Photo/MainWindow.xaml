@@ -51,6 +51,8 @@
                         Command="{Binding PictureStyleCommand}" />
                 <Button Content="Reload Image"
                         Command="{Binding ReloadCommand}" />
+                <Button Content="Compare To Origin"
+                        Command="{Binding CompareToOriginCommand}" />
             </StackPanel>
         </Grid>
 
@@ -60,20 +62,42 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <ScrollViewer x:Name="scrollImageTarget"
-                          PointerWheelChanged="scrollImageTarget_PointerWheelChanged"
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto"
-                          ZoomMode="Disabled"
-                          Grid.Row="0"
-                          BorderBrush="Gray"
-                          BorderThickness="0 1 1 1">
-                <Image x:Name="mainImage"
-                       Source="{Binding Image, Converter={StaticResource MatToBitmapSourceConverter}}"
-                       Margin="5"
-                       PointerMoved="mainImage_PointerMoved" />
-            </ScrollViewer>
-            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ScrollViewer x:Name="scrollImageTarget"
+                              PointerWheelChanged="scrollImageTarget_PointerWheelChanged"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              ZoomMode="Disabled"
+                              Grid.Column="0"
+                              Grid.ColumnSpan="{Binding Span}"
+                              BorderBrush="Gray"
+                              BorderThickness="0 1 1 1">
+                    <Image x:Name="mainImage"
+                           Source="{Binding Image, Converter={StaticResource MatToBitmapSourceConverter}}"
+                           Margin="5"
+                           PointerMoved="mainImage_PointerMoved" />
+                </ScrollViewer>
+                <ScrollViewer x:Name="scrollImageOrigin"
+                              PointerWheelChanged="scrollImageOrigin_PointerWheelChanged"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              ZoomMode="Disabled"
+                              Grid.Column="1"
+                              BorderBrush="Gray"
+                              BorderThickness="0 1 1 1"
+                              Visibility="{Binding OriginVisibility}">
+                    <Image x:Name="mainImageOrigin"
+                           Source="{Binding ImageOrigin, Converter={StaticResource MatToBitmapSourceConverter}}"
+                           Margin="5"
+                           PointerMoved="mainImageOrigin_PointerMoved" />
+                </ScrollViewer>
+
+            </Grid>
+
             <StackPanel Grid.Row="1"
                         Orientation="Horizontal"
                         BorderBrush="Gray"

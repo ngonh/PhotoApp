@@ -18,6 +18,15 @@ namespace Photo.ViewModels
     {
         #region Properties
         public string ImagePath { get; set; }
+        public Mat ImageOrigin
+        {
+            get => imageOrigin;
+            set
+            {
+                imageOrigin = value;
+                OnPropertyChanged(nameof(ImageOrigin));
+            }
+        }
         public Mat Image
         {
             get => image;
@@ -63,6 +72,15 @@ namespace Photo.ViewModels
                 OnPropertyChanged(nameof(FlipVisibility));
             }
         }
+        public Visibility OriginVisibility
+        {
+            get => originVisibility;
+            set
+            {
+                originVisibility = value;
+                OnPropertyChanged(nameof(OriginVisibility));
+            }
+        }
         public Visibility PictureStyleVisibility
         {
             get => pictureStyleVisibility;
@@ -99,6 +117,15 @@ namespace Photo.ViewModels
                 OnPropertyChanged(nameof(SelectedColor));
             }
         }
+        public int Span
+        {
+            get => span;
+            set
+            {
+                span = value;
+                OnPropertyChanged(nameof(Span));
+            }
+        }
         #endregion
 
         #region Constructor(s)
@@ -106,6 +133,7 @@ namespace Photo.ViewModels
         {
             #region Initialize
             BorderThickness = 1;
+            Span = 2;
             SelectedColor = new ColorItem() { Name = "Black", Value = Scalar.Black };
 
             ColorCode = new ObservableCollection<ColorItem>
@@ -254,7 +282,7 @@ namespace Photo.ViewModels
             };
 
             OperationVisibility = Visibility.Collapsed;
-
+            OriginVisibility = Visibility.Collapsed;
             CropVisibility = Visibility.Collapsed;
             RotateVisibility = Visibility.Collapsed;
             FlipVisibility = Visibility.Collapsed;
@@ -266,11 +294,20 @@ namespace Photo.ViewModels
             ExportImageCommand = new AsyncRelayCommand(SaveImageAsync);
             ReloadCommand = new RelayCommand(() =>
             {
+                #region Common
+                Span = 2;
+                #endregion
+                OriginVisibility = Visibility.Collapsed;
+
                 Image = new Mat(ImagePath);
                 flag = false;
             });
             CropCommand = new RelayCommand(() =>
             {
+                #region Common
+                Span = 2;
+                #endregion
+
                 #region Visible
                 CropVisibility = Visibility.Visible;
                 #endregion
@@ -279,10 +316,15 @@ namespace Photo.ViewModels
                 RotateVisibility = Visibility.Collapsed;
                 FlipVisibility = Visibility.Collapsed;
                 PictureStyleVisibility = Visibility.Collapsed;
+                OriginVisibility = Visibility.Collapsed;
                 #endregion
             });
             RotateCommand = new RelayCommand(() =>
             {
+                #region Common
+                Span = 2;
+                #endregion
+
                 #region Visible
                 RotateVisibility = Visibility.Visible;
                 #endregion
@@ -291,10 +333,15 @@ namespace Photo.ViewModels
                 CropVisibility = Visibility.Collapsed;
                 FlipVisibility = Visibility.Collapsed;
                 PictureStyleVisibility = Visibility.Collapsed;
+                OriginVisibility = Visibility.Collapsed;
                 #endregion
             });
             FlipCommand = new RelayCommand(() =>
             {
+                #region Common
+                Span = 2;
+                #endregion
+
                 #region Visible
                 FlipVisibility = Visibility.Visible;
                 #endregion
@@ -303,10 +350,15 @@ namespace Photo.ViewModels
                 CropVisibility = Visibility.Collapsed;
                 RotateVisibility = Visibility.Collapsed;
                 PictureStyleVisibility = Visibility.Collapsed;
+                OriginVisibility = Visibility.Collapsed;
                 #endregion
             });
             PictureStyleCommand = new RelayCommand(() =>
             {
+                #region Common
+                Span = 2;
+                #endregion
+
                 #region Visible
                 PictureStyleVisibility = Visibility.Visible;
                 #endregion
@@ -315,9 +367,26 @@ namespace Photo.ViewModels
                 FlipVisibility = Visibility.Collapsed;
                 CropVisibility = Visibility.Collapsed;
                 RotateVisibility = Visibility.Collapsed;
+                OriginVisibility = Visibility.Collapsed;
                 #endregion
             });
+            CompareToOriginCommand = new RelayCommand(() =>
+            {
+                #region Common
+                Span = 1;
+                #endregion
 
+                #region Visible
+                OriginVisibility = Visibility.Visible;
+                #endregion
+
+                #region Collapsed
+                FlipVisibility = Visibility.Collapsed;
+                CropVisibility = Visibility.Collapsed;
+                RotateVisibility = Visibility.Collapsed;
+                PictureStyleVisibility = Visibility.Collapsed;
+                #endregion
+            });
             #region CropLevelCommand(s)
             CropLevel1Command = new RelayCommand(CropImageLevel1);
             CropLevel2Command = new RelayCommand(CropImageLevel2);
@@ -362,6 +431,7 @@ namespace Photo.ViewModels
         public ICommand RotateCommand { get; }
         public ICommand FlipCommand { get; }
         public ICommand PictureStyleCommand { get; }
+        public ICommand CompareToOriginCommand { get; }
 
         public ICommand CropLevel1Command { get; }
         public ICommand CropLevel2Command { get; }
@@ -408,6 +478,7 @@ namespace Photo.ViewModels
                 if (file != null)
                 {
                     Image = new Mat(file.Path);
+                    ImageOrigin = new Mat(file.Path);
 
                     string assetsPath = @"D:\Assets";
                     if (!Directory.Exists(assetsPath))
@@ -572,7 +643,7 @@ namespace Photo.ViewModels
                 return;
             }
 
-            int borderThickness = 50;
+            int borderThickness = Image.Width / 30;
 
             int newWidth = Image.Width + 2 * borderThickness;
             int newHeight = Image.Height + 2 * borderThickness;
@@ -652,7 +723,8 @@ namespace Photo.ViewModels
                     BorderThickness, BorderThickness, BorderTypes.Constant, SelectedColor.Value);
                 Image = imageWithBorder;
                 return;
-            } else
+            }
+            else
             {
                 matTemp = Image;
                 Mat imageWithBorder = new Mat();
@@ -666,16 +738,19 @@ namespace Photo.ViewModels
 
         #region Private(s)
         private Mat image;
+        private Mat imageOrigin;
         private Visibility cropVisibility;
         private Visibility operationVisibility;
         private Visibility rotateVisibility;
         private Visibility flipVisibility;
         private Visibility pictureStyleVisibility;
+        private Visibility originVisibility;
         private ObservableCollection<ColorItem> colorCode;
         private ColorItem selectedColor;
-        private int borderThickness; 
+        private int borderThickness;
         private Mat matTemp;
         private bool flag = false;
+        private int span;
         #endregion
     }
 }
