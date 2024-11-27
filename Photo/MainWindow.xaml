@@ -53,6 +53,8 @@
                         Command="{Binding ReloadCommand}" />
                 <Button Content="Compare To Origin"
                         Command="{Binding CompareToOriginCommand}" />
+                <Button Content="White Balance"
+                        Command="{Binding WhiteBalanceCommand}" />
             </StackPanel>
         </Grid>
 

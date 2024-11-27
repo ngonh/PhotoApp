@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OpenCvSharp;
+using OpenCvSharp.XPhoto;
 using Photo.Models;
 using System;
 using System.Collections.Generic;
@@ -387,6 +388,7 @@ namespace Photo.ViewModels
                 PictureStyleVisibility = Visibility.Collapsed;
                 #endregion
             });
+            WhiteBalanceCommand = new RelayCommand(WhiteBalance);
             #region CropLevelCommand(s)
             CropLevel1Command = new RelayCommand(CropImageLevel1);
             CropLevel2Command = new RelayCommand(CropImageLevel2);
@@ -457,6 +459,7 @@ namespace Photo.ViewModels
         public ICommand StyleLevel10Command { get; }
 
         public ICommand SetBorderCommand { get; }
+        public ICommand WhiteBalanceCommand { get; }
         #endregion
 
         #region Method(s)
@@ -519,6 +522,12 @@ namespace Photo.ViewModels
                 };
                 await dialog.ShowAsync();
             }
+        }
+        public void WhiteBalance()
+        {
+            int kelvin = 7500;
+            Mat adjusted = AdjustColorTemperature(Image, kelvin);
+            Image = adjusted;
         }
         public async Task SaveImageAsync()
         {
@@ -733,6 +742,46 @@ namespace Photo.ViewModels
                 Image = imageWithBorder;
                 flag = true;
             }
+        }
+        public static Mat AdjustColorTemperature(Mat src, int kelvin)
+        {
+            if (src.Empty())
+                throw new ArgumentException("Ảnh nguồn không hợp lệ");
+            Mat result = src.Clone();
+
+            double[] balanceFactors = GetColorBalanceFactors(kelvin);
+
+            var channels = Cv2.Split(result);
+
+            channels[0] *= balanceFactors[0];
+            channels[2] *= balanceFactors[2];
+
+            Cv2.Merge(channels, result);
+            return result;
+        }
+        private static double[] GetColorBalanceFactors(int kelvin)
+        {
+            kelvin = Math.Clamp(kelvin, 1000, 40000);
+
+            double temp = kelvin / 100.0;
+            double red, green, blue;
+            if (temp <= 66)
+            {
+                red = 255;
+                green = temp <= 19 ? 0 : (99.4708025861 * Math.Log(temp - 10) - 161.1195681661);
+                blue = temp <= 19 ? 0 : (138.5177312231 * Math.Log(temp - 10) - 305.0447927307);
+            }
+            else
+            {
+                red = 329.698727446 * Math.Pow(temp - 60, -0.1332047592);
+                green = 288.1221695283 * Math.Pow(temp - 60, -0.0755148492);
+                blue = 255;
+            }
+            red = Math.Clamp(red, 0, 255);
+            green = Math.Clamp(green, 0, 255);
+            blue = Math.Clamp(blue, 0, 255);
+
+            return new double[] { blue / 255.0, green / 255.0, red / 255.0 };
         }
         #endregion
 
