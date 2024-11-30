@@ -91,6 +91,15 @@ namespace Photo.ViewModels
                 OnPropertyChanged(nameof(PictureStyleVisibility));
             }
         }
+        public Visibility WhiteBalanceVisibility
+        {
+            get => whiteBalanceVisibility;
+            set
+            {
+                whiteBalanceVisibility = value;
+                OnPropertyChanged(nameof(WhiteBalanceVisibility));
+            }
+        }
         public ObservableCollection<ColorItem> ColorCode
         {
             get => colorCode;
@@ -125,6 +134,16 @@ namespace Photo.ViewModels
             {
                 span = value;
                 OnPropertyChanged(nameof(Span));
+            }
+        }
+        public int SliderValue
+        {
+            get => sliderValue;
+            set
+            {
+                sliderValue = value;
+                OnPropertyChanged(nameof(SliderValue));
+                WhiteBalance();
             }
         }
         #endregion
@@ -288,6 +307,7 @@ namespace Photo.ViewModels
             RotateVisibility = Visibility.Collapsed;
             FlipVisibility = Visibility.Collapsed;
             PictureStyleVisibility = Visibility.Collapsed;
+            WhiteBalanceVisibility = Visibility.Collapsed;
             #endregion
 
             #region CommonCommand(s)
@@ -318,6 +338,7 @@ namespace Photo.ViewModels
                 FlipVisibility = Visibility.Collapsed;
                 PictureStyleVisibility = Visibility.Collapsed;
                 OriginVisibility = Visibility.Collapsed;
+                WhiteBalanceVisibility = Visibility.Collapsed;
                 #endregion
             });
             RotateCommand = new RelayCommand(() =>
@@ -335,6 +356,7 @@ namespace Photo.ViewModels
                 FlipVisibility = Visibility.Collapsed;
                 PictureStyleVisibility = Visibility.Collapsed;
                 OriginVisibility = Visibility.Collapsed;
+                WhiteBalanceVisibility = Visibility.Collapsed;
                 #endregion
             });
             FlipCommand = new RelayCommand(() =>
@@ -352,6 +374,7 @@ namespace Photo.ViewModels
                 RotateVisibility = Visibility.Collapsed;
                 PictureStyleVisibility = Visibility.Collapsed;
                 OriginVisibility = Visibility.Collapsed;
+                WhiteBalanceVisibility = Visibility.Collapsed;
                 #endregion
             });
             PictureStyleCommand = new RelayCommand(() =>
@@ -369,6 +392,7 @@ namespace Photo.ViewModels
                 CropVisibility = Visibility.Collapsed;
                 RotateVisibility = Visibility.Collapsed;
                 OriginVisibility = Visibility.Collapsed;
+                WhiteBalanceVisibility = Visibility.Collapsed;
                 #endregion
             });
             CompareToOriginCommand = new RelayCommand(() =>
@@ -386,6 +410,7 @@ namespace Photo.ViewModels
                 CropVisibility = Visibility.Collapsed;
                 RotateVisibility = Visibility.Collapsed;
                 PictureStyleVisibility = Visibility.Collapsed;
+                WhiteBalanceVisibility = Visibility.Collapsed;
                 #endregion
             });
             WhiteBalanceCommand = new RelayCommand(WhiteBalance);
@@ -525,8 +550,23 @@ namespace Photo.ViewModels
         }
         public void WhiteBalance()
         {
-            int kelvin = 7500;
-            Mat adjusted = AdjustColorTemperature(Image, kelvin);
+            #region Common
+            Span = 2;
+            #endregion
+
+            #region Visible
+            WhiteBalanceVisibility = Visibility.Visible;
+            #endregion
+
+            #region Collapsed
+            FlipVisibility = Visibility.Collapsed;
+            CropVisibility = Visibility.Collapsed;
+            RotateVisibility = Visibility.Collapsed;
+            PictureStyleVisibility = Visibility.Collapsed;
+            OriginVisibility = Visibility.Collapsed;
+            #endregion
+            //int kelvin = 1000;
+            Mat adjusted = AdjustColorTemperature(Image, SliderValue);
             Image = adjusted;
         }
         public async Task SaveImageAsync()
@@ -747,28 +787,40 @@ namespace Photo.ViewModels
         {
             if (src.Empty())
                 throw new ArgumentException("Ảnh nguồn không hợp lệ");
-            Mat result = src.Clone();
 
+            // Lấy các hệ số cân bằng màu
             double[] balanceFactors = GetColorBalanceFactors(kelvin);
 
-            var channels = Cv2.Split(result);
+            // Chia ảnh thành các kênh
+            var channels = Cv2.Split(src);
 
-            channels[0] *= balanceFactors[0];
-            channels[2] *= balanceFactors[2];
+            // Áp dụng hệ số cân bằng màu cho từng kênh
+            Cv2.Multiply(channels[0], new Scalar(balanceFactors[0]), channels[0]); // Blue
+            Cv2.Multiply(channels[1], new Scalar(balanceFactors[1]), channels[1]); // Green
+            Cv2.Multiply(channels[2], new Scalar(balanceFactors[2]), channels[2]); // Red
 
+            // Hợp nhất lại thành ảnh kết quả
+            Mat result = new Mat();
             Cv2.Merge(channels, result);
+
+            // Giải phóng bộ nhớ các kênh trung gian
+            foreach (var channel in channels)
+                channel.Dispose();
+
             return result;
         }
+
         private static double[] GetColorBalanceFactors(int kelvin)
         {
             kelvin = Math.Clamp(kelvin, 1000, 40000);
 
             double temp = kelvin / 100.0;
             double red, green, blue;
+
             if (temp <= 66)
             {
                 red = 255;
-                green = temp <= 19 ? 0 : (99.4708025861 * Math.Log(temp - 10) - 161.1195681661);
+                green = temp <= 10 ? 0 : (99.4708025861 * Math.Log(temp) - 161.1195681661);
                 blue = temp <= 19 ? 0 : (138.5177312231 * Math.Log(temp - 10) - 305.0447927307);
             }
             else
@@ -777,12 +829,16 @@ namespace Photo.ViewModels
                 green = 288.1221695283 * Math.Pow(temp - 60, -0.0755148492);
                 blue = 255;
             }
+
+            // Giới hạn giá trị trong khoảng [0, 255]
             red = Math.Clamp(red, 0, 255);
             green = Math.Clamp(green, 0, 255);
             blue = Math.Clamp(blue, 0, 255);
 
+            // Trả về tỷ lệ cân bằng
             return new double[] { blue / 255.0, green / 255.0, red / 255.0 };
         }
+
         #endregion
 
         #region Private(s)
@@ -794,12 +850,14 @@ namespace Photo.ViewModels
         private Visibility flipVisibility;
         private Visibility pictureStyleVisibility;
         private Visibility originVisibility;
+        private Visibility whiteBalanceVisibility;
         private ObservableCollection<ColorItem> colorCode;
         private ColorItem selectedColor;
         private int borderThickness;
         private Mat matTemp;
         private bool flag = false;
         private int span;
+        private int sliderValue = 1000;
         #endregion
     }
 }
